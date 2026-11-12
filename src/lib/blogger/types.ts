@@ -357,6 +357,21 @@ export interface Firebase {
 	config?: FirebaseConfig;
 }
 
+/**
+ * Blogger's own "previous / next page" links for the current listing page,
+ * plus how many posts the page holds. `newer`/`older` are null on the first/last page.
+ */
+export interface Pager {
+	newer: string | null;
+	older: string | null;
+	count: number;
+	/**
+	 * true: the template has no `json:pager` (not re-uploaded yet), so newer/older
+	 * are unknown and pagination is worked out from the public feed instead.
+	 */
+	derived?: boolean;
+}
+
 export interface BloggerData {
 	blog: Blog;
 	view: View;
@@ -364,6 +379,7 @@ export interface BloggerData {
 	labels: Record<string, number>;
 	authors: BlogAuthor[];
 	posts: Record<string, PostMinimal | Post>;
+	pager: Pager;
 	post?: Post;
 	page?: Post;
 	comments?: Comments;

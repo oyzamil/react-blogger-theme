@@ -11,6 +11,7 @@ import type {
 	Meta,
 	MetaImage,
 	OpenGraph,
+	Pager,
 	Popular,
 	Post,
 	PostMinimal,
@@ -97,6 +98,7 @@ export function parseBloggerData(source: string | Document): BloggerData {
 		labels,
 		authors,
 		posts,
+		pager,
 		comments,
 		header,
 		contact,
@@ -115,6 +117,7 @@ export function parseBloggerData(source: string | Document): BloggerData {
 		{ id: "labels", fallback: {} },
 		{ id: "authors", fallback: [] },
 		{ id: "posts", fallback: {} },
+		{ id: "pager", fallback: null },
 		{ id: "comments", fallback: null },
 		{ id: "header", fallback: null },
 		{ id: "contact" },
@@ -147,6 +150,7 @@ export function parseBloggerData(source: string | Document): BloggerData {
 		Record<string, number>,
 		BlogAuthor[],
 		Record<string, PostMinimal | Post>,
+		Pager | null,
 		Comments | null,
 		Header | null,
 		Contact,
@@ -233,6 +237,21 @@ export function parseBloggerData(source: string | Document): BloggerData {
 		}
 	}
 	data.posts = posts;
+
+	// Template without json:pager (not re-uploaded yet): newer/older are unknown,
+	// pagination is derived from the public feed instead.
+	data.pager = pager
+		? {
+				newer: pager.newer ? unescapeHtml(pager.newer) : null,
+				older: pager.older ? unescapeHtml(pager.older) : null,
+				count: pager.count,
+			}
+		: {
+				newer: null,
+				older: null,
+				count: Object.keys(posts).length,
+				derived: true,
+			};
 
 	if (data.blog.postId) {
 		data.post = posts[data.blog.postId] as Post;

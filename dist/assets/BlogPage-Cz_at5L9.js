@@ -1,1 +1,0 @@
-import{j as r}from"./template-CfSHStyw.js";import{B as o}from"./Breadcrumbs-CNZ8mS71.js";import{L as e}from"./library-big-Bv6RMGgJ.js";import"./house-CBkmwb44.js";function m(){return r.jsxs("div",{className:"flex flex-col gap-5",children:[r.jsx(o,{items:[{label:"Blog",icon:e}]}),r.jsx("div",{children:"Blog Page"})]})}export{m as default};

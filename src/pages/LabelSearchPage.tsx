@@ -3,6 +3,7 @@ import { TagIcon, TagsIcon } from "lucide-react";
 import type { LabelSearch } from "@/lib/blogger";
 
 import Breadcrumbs from "@/components/Breadcrumbs";
+import PostList from "@/components/PostList";
 
 import { useBlogger } from "@/contexts/blogger";
 
@@ -20,6 +21,8 @@ export default function LabelSearchPage() {
 			/>
 
 			<h2 className="font-medium text-xl">{search.label}</h2>
+
+			<PostList />
 		</div>
 	);
 }

@@ -1,0 +1,12 @@
+/*
+ * Used only by `npm run build:inline` (replaces @fontsource-variable/inclusive-sans).
+ * @fontsource ships woff2 files that need hosting; Google Fonts does not.
+ * Geom already comes from Google Fonts in the template.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap");
+
+/* html:root (0,1,1) beats the @theme tokens in globals.css regardless of order */
+html:root {
+	--font-inclusive-sans: "Inclusive Sans", sans-serif;
+	--font-fira-code: "Fira Code", monospace;
+}

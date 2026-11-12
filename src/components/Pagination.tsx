@@ -2,6 +2,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { Link } from "react-router";
 
+import type { Post, PostMinimal } from "@/lib/blogger";
+
+import { useBlogger } from "@/contexts/blogger";
+import { useInfinitePosts } from "@/hooks/use-infinite-posts";
 import { type UsePaginationOptions, usePagination } from "@/hooks/use-pagination";
 
 import {
@@ -11,7 +15,10 @@ import {
 	PaginationItem,
 	PaginationLink,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
+
+import PostCard from "./PostCard";
 
 export interface PaginationProps
 	extends Omit<ComponentProps<"nav">, "children">,
@@ -19,21 +26,48 @@ export interface PaginationProps
 	/**
 	 * `numbers`: `‹ 1 … 4 [5] 6 … 20 ›` (a few small feed requests).
 	 * `simple`: `‹ Newer · Older ›` using only Blogger's own links.
+	 * `infinite`: renders the posts of the NEXT pages below the list you already
+	 * render, loading them while you scroll (or on a button, see `trigger`).
 	 */
-	variant?: "numbers" | "simple";
+	variant?: "numbers" | "simple" | "infinite";
 	/** Label of the previous-page (newer posts) button. */
 	prevLabel?: ReactNode;
 	/** Label of the next-page (older posts) button. */
 	nextLabel?: ReactNode;
 	/** Render `Page 5 of 20` under the numbers. */
 	showSummary?: boolean;
+
+	/* ---- variant="infinite" ---- */
+	/** `scroll`: load automatically. `button`: load on click. Default `scroll`. */
+	trigger?: "scroll" | "button";
+	/** Start loading this far before the end of the list. Default `600px`. */
+	rootMargin?: string;
+	/** Render one loaded post. Default: `<PostCard />`. */
+	renderPost?: (post: PostMinimal | Post) => ReactNode;
+	/** Shown while loading. */
+	loader?: ReactNode;
+	/** Shown after the last page. `null` hides it. */
+	endMessage?: ReactNode;
+	/** Label of the button (`trigger="button"`) and of the retry button. */
+	loadMoreLabel?: ReactNode;
 }
 
 /**
  * Pagination for any Blogger listing page (home, search, label, archive).
  * Reads everything it needs from the current page's Blogger data.
  */
-export default function Pagination({
+export default function Pagination(props: PaginationProps) {
+	const { data } = useBlogger();
+
+	if (props.variant === "infinite") {
+		// key: start over when the listing page changes
+		return <InfinitePagination key={data.view.url} {...props} />;
+	}
+
+	return <PagedPagination {...props} />;
+}
+
+function PagedPagination({
 	variant = "numbers",
 	siblings,
 	boundaries,
@@ -152,5 +186,53 @@ function PaginationSkeleton() {
 				</PaginationItem>
 			))}
 		</>
+	);
+}
+
+function InfinitePagination({
+	trigger = "scroll",
+	rootMargin,
+	renderPost = (post) => <PostCard key={post.id} post={post} />,
+	loader,
+	endMessage = "You've reached the end.",
+	loadMoreLabel,
+	className,
+}: PaginationProps) {
+	const { posts, status, hasMore, loadMore, sentinelRef } = useInfinitePosts({
+		rootMargin,
+		auto: trigger === "scroll",
+	});
+
+	return (
+		<div className={cn("flex flex-col gap-4", className)}>
+			{posts.map((post) => renderPost(post))}
+
+			{/* observed: when it comes near the viewport the next page loads */}
+			<div ref={sentinelRef} aria-hidden className="h-px" />
+
+			<div
+				aria-live="polite"
+				className="flex min-h-10 items-center justify-center text-muted-foreground text-sm"
+			>
+				{status === "loading" &&
+					(loader ?? (
+						<span className="size-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+					))}
+
+				{status === "error" && (
+					<Button variant="outline" size="sm" onClick={loadMore}>
+						{loadMoreLabel ?? "Could not load. Try again"}
+					</Button>
+				)}
+
+				{status === "idle" && trigger === "button" && (
+					<Button variant="outline" size="sm" onClick={loadMore}>
+						{loadMoreLabel ?? "Load more"}
+					</Button>
+				)}
+
+				{!hasMore && posts.length > 0 && endMessage}
+			</div>
+		</div>
 	);
 }

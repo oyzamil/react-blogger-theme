@@ -41,6 +41,25 @@ Cost: the template grows to ~1.5 MB (~350 KB gzip) and is re-sent with every pag
 
 - Template: `json:pager` (Blog widget) exposes Blogger's own `newerPageUrl` / `olderPageUrl`. Re-upload the template. If it is not re-uploaded yet, pagination still works: it is worked out from the public feed (`pager.derived`).
 - Nothing shows when the blog has no more posts than fit on one page.
+
+### Infinite scroll
+
+```tsx
+<PostList pagination={{ variant: "infinite" }} />
+
+// or by hand: the page keeps rendering ITS posts, the component adds the next pages below
+{posts.map((p) => <PostCard key={p.id} post={p} />)}
+<Pagination variant="infinite" />
+<Pagination variant="infinite" trigger="button" loadMoreLabel="Show more" />
+<Pagination variant="infinite" rootMargin="1000px" endMessage={null}
+            renderPost={(post) => <MyCard post={post} />} loader={<Spinner />} />
+```
+
+- Loads the next page when the end of the list comes within `rootMargin` (default `600px`). `trigger="button"` loads on click instead.
+- Each page is fetched like a normal navigation (`fetchBlogger`, no post bodies), de-duplicated by post id, appended in order.
+- Failed load shows a retry button. After the last page it shows `endMessage`.
+- Resets when the listing page changes (new search, label, ...). Going to a post and back starts again from the first page.
+- `useInfinitePosts()` (`src/hooks/use-infinite-posts.ts`) is the headless version.
 - `usePagination()` (`src/hooks/use-pagination.ts`) is the headless version, build any UI on it.
 - `src/lib/blogger/pagination.ts` holds the pure logic: `getPageRange`, `buildPageHref`, feed helpers.
 - Numbers use the public feed (`/feeds/posts/summary`): 1 request for the total, 1 for the current page, up to ~6 tiny ones for page links. Results are cached. If a request fails the control falls back to Newer/Older.

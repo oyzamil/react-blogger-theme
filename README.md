@@ -28,6 +28,24 @@ npm run build:inline # JS + CSS copied INTO dist/template.xml, nothing to host
 
 Cost: the template grows to ~1.5 MB (~350 KB gzip) and is re-sent with every page (no browser cache for inline JS). Normal build is lighter per page view.
 
+## Comments
+
+`<Comments />` (`src/components/Comments.tsx`) is on `PostPage` and `PagePage`. Multi-level threads (any depth), Blogger's own comment form for new comments and replies.
+
+```tsx
+<Comments />
+<Comments defaultSort="newest" pageSize={10} maxDepth={3} formMode="open" frameHeight={460} />
+```
+
+- Template: `json:comments` now emits a FLAT `items` list with `inReplyTo` (the old one built 2 levels and dropped deeper replies). **Re-upload the template.** Until then the old shape has no `inReplyTo`, so every comment shows top-level.
+- `buildCommentTree()` (`src/lib/blogger/comments.ts`) rebuilds the threads. A reply whose parent is gone becomes top-level instead of vanishing.
+- Form = `https://www.blogger.com/comment/frame/BLOG_ID?po=POST_ID`. Reply = the same URL plus `&parentID=COMMENT_ID`. It is the same form Blogger shows (Google sign-in, name/URL, anonymous), loaded in an iframe only when someone clicks "Write a comment" / "Reply".
+- The frame is another origin, so its height cannot be read (`frameHeight`, default 420) and it does not report a saved comment. The 2nd `load` of the frame (the form navigates when sent) is treated as "submitted": a note shows and the comments reload after 1.5 s. The reload button does the same by hand.
+- Comments set to popup / full page (Settings > Comments): no inline form, buttons link to Blogger's page in a new tab; replies cannot be threaded from there.
+- Per-comment `#c123` permalinks scroll to and highlight the comment.
+- Blogger only loads the first 200 comments of a post into the template.
+- `useComments()` (`src/hooks/use-comments.ts`) is the headless version.
+
 ## Pagination
 
 `<Pagination />` (`src/components/Pagination.tsx`) works on every listing page: home, `/search`, label, search, archive.

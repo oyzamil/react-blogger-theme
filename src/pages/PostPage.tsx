@@ -6,6 +6,7 @@ import { type Post } from "@/lib/blogger";
 
 import ArticleContent from "@/components/ArticleContent";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import Comments from "@/components/Comments";
 import Thumbnail from "@/components/Thumbnail";
 
 import { useBlogger } from "@/contexts/blogger";
@@ -42,6 +43,8 @@ export default function PostPage() {
 			<article className="prose">
 				<ArticleContent html={post.content} />
 			</article>
+
+			<Comments />
 		</main>
 	);
 }

@@ -199,12 +199,14 @@ export interface CommentBase {
 	adminClass: string;
 }
 
-export interface Reply extends CommentBase {
-	inReplyTo: string;
-}
-
+/**
+ * Blogger stores comments flat: a reply points at its parent with `inReplyTo`.
+ * Replies to replies are possible, so the thread can be any depth
+ * (see `buildCommentTree`).
+ */
 export interface Comment extends CommentBase {
-	replies: Reply[];
+	/** Id of the comment this one answers, null for a top-level comment. */
+	inReplyTo: string | null;
 }
 
 export type CommentsSetting = 'disabled' | 'hidden' | 'readonly' | 'allowed';

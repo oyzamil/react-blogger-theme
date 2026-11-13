@@ -1,4 +1,5 @@
 import { unescapeHtml } from "@/utils";
+import { normalizeComments } from "./comments";
 import type {
 	BlogAuthor,
 	BloggerData,
@@ -262,7 +263,7 @@ export function parseBloggerData(source: string | Document): BloggerData {
 	}
 
 	if (comments) {
-		data.comments = comments;
+		data.comments = { ...comments, items: normalizeComments(comments.items) };
 	}
 
 	data.contact = contact;

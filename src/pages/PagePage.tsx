@@ -4,6 +4,7 @@ import type { Post } from "@/lib/blogger";
 
 import ArticleContent from "@/components/ArticleContent";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import Comments from "@/components/Comments";
 
 import { useBlogger } from "@/contexts/blogger";
 
@@ -24,6 +25,8 @@ export default function PagePage() {
 			<article className="prose">
 				<ArticleContent html={page.content} />
 			</article>
+
+			<Comments />
 		</div>
 	);
 }

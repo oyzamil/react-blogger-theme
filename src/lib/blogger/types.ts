@@ -224,6 +224,8 @@ export interface Comments {
 	setting: CommentsSetting;
 	location: CommentsLocation | null;
 	items: Comment[];
+	/** The template still sends the old nested shape (see `normalizeComments`). */
+	legacy?: boolean;
 }
 
 export type HeaderImagePlacement = 'BEHIND' | 'REPLACE' | 'BEFORE_DESCRIPTION';

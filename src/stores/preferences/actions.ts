@@ -107,9 +107,9 @@ export function PreferencesBlogAdminAction() {
 
 		let cancelled = false;
 
-		blogAdminDetectionPromise.then(() => {
+		blogAdminDetectionPromise.then((isBlogAdmin) => {
 			if (!cancelled) {
-				setBlogAdmin(cancelled);
+				setBlogAdmin(isBlogAdmin);
 			}
 		});
 

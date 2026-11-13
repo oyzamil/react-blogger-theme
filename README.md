@@ -28,6 +28,10 @@ npm run build:inline # JS + CSS copied INTO dist/template.xml, nothing to host
 
 Cost: the template grows to ~1.5 MB (~350 KB gzip) and is re-sent with every page (no browser cache for inline JS). Normal build is lighter per page view.
 
+## Page loading bar
+
+`<NavigationProgress />` (`src/components/NavigationProgress.tsx`, mounted in `RootComponent`): thin bar at the top while react-router is loading the next page. Appears after 120 ms (no flash on instant pages), creeps to ~90 %, jumps to 100 % when ready.
+
 ## Comments
 
 `<Comments />` (`src/components/Comments.tsx`) is on `PostPage` and `PagePage`. Multi-level threads (any depth), Blogger's own comment form for new comments and replies.
@@ -42,6 +46,12 @@ Cost: the template grows to ~1.5 MB (~350 KB gzip) and is re-sent with every pag
 - Form = `https://www.blogger.com/comment/frame/BLOG_ID?po=POST_ID`. Reply = the same URL plus `&parentID=COMMENT_ID`. It is the same form Blogger shows (Google sign-in, name/URL, anonymous), loaded in an iframe only when someone clicks "Write a comment" / "Reply".
 - The frame is another origin, so its height cannot be read (`frameHeight`, default 420) and it does not report a saved comment. The 2nd `load` of the frame (the form navigates when sent) is treated as "submitted": a note shows and the comments reload after 1.5 s. The reload button does the same by hand.
 - Comments set to popup / full page (Settings > Comments): no inline form, buttons link to Blogger's page in a new tab; replies cannot be threaded from there.
+- `maxReplyDepth` (default `1`): levels of replies. A comment gets a Reply button only while its depth is below it: `1` = replies to top-level comments only (what Blogger supports), `2` = replies to replies, `0` = no replies. No button past the limit.
+- Delete: admins see a Delete button (Blogger's `deleteUrl`). It opens Blogger's delete page in a small window and reloads the comments when that window closes. Admin = `useBlogAdmin()` (Blogger's authorization.css, detected in production; always true in dev so you can try it).
+- Reply to a reply not showing up? Check what Blogger stored: on the post page run in the console
+  `JSON.parse(document.getElementById('json:comments').textContent).items.map(c => [c.id, c.inReplyTo])`
+  and look at the Blogger dashboard > Comments (also the moderation and spam tabs).
+- "Showing 3 of 5 comments" = the template sent fewer comments than Blogger counts. Cause: template not re-uploaded (old shape: nested `replies`, anything deeper than 2 levels is dropped; the console warns). Re-upload `template.xml`.
 - Per-comment `#c123` permalinks scroll to and highlight the comment.
 - Blogger only loads the first 200 comments of a post into the template.
 - `useComments()` (`src/hooks/use-comments.ts`) is the headless version.

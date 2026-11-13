@@ -263,7 +263,11 @@ export function parseBloggerData(source: string | Document): BloggerData {
 	}
 
 	if (comments) {
-		data.comments = { ...comments, items: normalizeComments(comments.items) };
+		data.comments = {
+			...comments,
+			items: normalizeComments(comments.items),
+			legacy: comments.items.some((item) => "replies" in item) || undefined,
+		};
 	}
 
 	data.contact = contact;

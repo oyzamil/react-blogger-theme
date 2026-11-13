@@ -19,6 +19,13 @@ export interface CommentsProps {
 	pageSize?: number;
 	/** Replies move right up to this depth, deeper ones keep the same indent. */
 	maxDepth?: number;
+	/**
+	 * Levels of replies. `1` (default) = replies to top-level comments only, which
+	 * is what Blogger supports. `2` = replies to replies, and so on. `0` = no
+	 * replies, only new top-level comments. A comment gets a Reply button only
+	 * while its depth is below this.
+	 */
+	maxReplyDepth?: number;
 	/** Height of Blogger's comment form (it cannot be measured, see CommentFrame). */
 	frameHeight?: number;
 	/** `collapsed`: a button opens the form (nothing loads until then). */
@@ -37,6 +44,7 @@ export default function Comments({
 	defaultSort = "oldest",
 	pageSize = 20,
 	maxDepth = 4,
+	maxReplyDepth = 1,
 	frameHeight = 420,
 	formMode = "collapsed",
 	heading,
@@ -50,6 +58,15 @@ export default function Comments({
 	const [formOpen, setFormOpen] = useState(formMode === "open");
 	const [visible, setVisible] = useState(pageSize);
 	const [highlightId, setHighlightId] = useState<string | null>(null);
+
+	// the template sends the old nested shape: replies deeper than 2 levels are lost
+	useEffect(() => {
+		if (comments?.legacy) {
+			console.warn(
+				"[comments] The template is out of date (nested `replies`, no `inReplyTo`). Re-upload it to get every reply.",
+			);
+		}
+	}, [comments?.legacy]);
 
 	// a comment was (probably) just sent: give Blogger a moment, then reload
 	const onSubmitted = useCallback(() => {
@@ -99,10 +116,12 @@ export default function Comments({
 				fallbackUrl,
 				canReply,
 				maxDepth,
+				maxReplyDepth,
 				frameHeight,
 				replyingTo,
 				setReplyingTo,
 				onSubmitted,
+				onDeleted: () => void refresh(),
 				highlightId,
 			}}
 		>
@@ -143,6 +162,12 @@ export default function Comments({
 						</Button>
 					</div>
 				</header>
+
+				{comments.items.length < comments.total && (
+					<p role="status" className="text-muted-foreground text-xs">
+						Showing {comments.items.length} of {comments.total} comments.
+					</p>
+				)}
 
 				{/* new top-level comment */}
 				{embedded && location ? (

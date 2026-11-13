@@ -9,6 +9,7 @@ import { type BloggerData, fetchBlogger } from "@/lib/blogger";
 import { bloggerData } from "@/lib/blogger-data";
 
 import { BloggerProvider } from "@/contexts/blogger";
+import NavigationProgress from "@/components/NavigationProgress";
 import BlogLayout from "@/layouts/BlogLayout";
 import ErrorLayout from "@/layouts/ErrorLayout";
 
@@ -49,6 +50,7 @@ function RootComponent() {
 
 	return (
 		<BloggerProvider data={data}>
+			<NavigationProgress />
 			<BlogLayout />
 		</BloggerProvider>
 	);

@@ -5,39 +5,27 @@
 
 <b:defaultmarkups>
 <b:defaultmarkup type='Common'>
+<b:comment><!--[ <head> ]--></b:comment>
 <b:includable id='theme:head'>
-  <b:comment><!--[ <head> ]--></b:comment>
-
-  <b:comment><!--[ Meta for browser ]--></b:comment>
   <meta expr:charset='data:blog.encoding'/>
   <meta content='IE=edge' http-equiv='X-UA-Compatible'/>
   <meta content='width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, user-scalable=yes' name='viewport'/>
 
   <b:if cond='data:view.isMultipleItems'>
     <b:if cond='data:view.isHomepage'>
-      <b:comment><!--[ Homepage title ]--></b:comment>
       <title><data:blog.title/></title>
       <b:elseif cond='data:view.search.query'/>
-      <b:comment><!--[ Search title ]--></b:comment>
       <title><data:messages.search.escaped/>: <data:view.search.query/></title>
       <b:elseif cond='data:view.search.label'/>
-      <b:comment><!--[ Label title ]--></b:comment>
       <title><data:blog.pageName/> - <data:blog.title/></title>
       <b:elseif cond='data:view.isArchive'/>
-      <b:comment><!--[ Archive title ]--></b:comment>
-      <b:comment><!--[ You can replace 'Blog archive in: ' with your own title ]--></b:comment>
       <title>Blog archive in: <data:blog.pageName.escaped/></title>
       <b:else/>
-      <b:comment><!--[ You can replace 'Blog: ' with your own title ]--></b:comment>
       <title>Blog: <data:blog.title/></title>
     </b:if>
     <b:elseif cond='data:view.isError'/>
-    <b:comment><!--[ Error title ]--></b:comment>
-    <b:comment><!--[ You can replace 'Error 404: Not Found' with your own error title ]--></b:comment>
     <title>Error 404: Not Found</title>
     <b:else/>
-    <b:comment><!--[ SingleItem title ]--></b:comment>
-    <b:comment><!--[ It will omit the blog title when the character count exceeds 57 ]--></b:comment>
     <b:if cond='(data:blog.pageName + data:blog.title).length &gt; 57'>
       <title><data:blog.pageName.escaped/></title>
       <b:else/>
@@ -74,6 +62,15 @@
     <meta expr:content='data:blog.title' name='apple-mobile-web-app-title'/>
     <meta expr:content='yes' name='apple-mobile-web-app-capable'/>
   </b:if>
+
+  <b:comment><!--[ Web Crawlers ]--></b:comment>
+  <meta content='' name='google-site-verification'/>
+  <meta content='' name='msvalidate.01'/>
+  <meta content='' name='yandex-verification'/>
+  <meta content='' name='yandex-verification'/>
+
+  <b:comment><!--[ Robots ]--></b:comment>
+  <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
 
   <b:comment><!--[ Meta generator ]--></b:comment>
   <meta content='Blogger' name='generator'/>
